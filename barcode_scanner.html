@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Barcode Scanner to Google Sheets</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner to Google Sheets</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #reader {
+            width: 90%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Scan a Barcode</h2>
+    <button onclick="startScanner()">Start Scanning</button>
+    <div id="reader" style="display: none;"></div>
+    <p id="result">Waiting for scan...</p>
+
+    <script>
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzXWQMxDEPoHZNnN-WuTMn4i67CStAu4D8gjsZ4lp-6H-BAZxn-x-PrMB4yy642Is5X/exec"; // Replace with your actual Web App URL
+        let html5QrCode;
+
+        function startScanner() {
+            document.getElementById("reader").style.display = "block";
+            document.querySelector("button").style.display = "none";
+
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },  // Use back camera on phones
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess
+            ).catch(err => {
+                alert("Camera access denied! Please allow camera permissions.");
+                console.error(err);
+            });
+        }
+
+        function onScanSuccess(decodedText) {
+            document.getElementById('result').innerText = "Scanned: " + decodedText;
+
+            let barcodeData = {
+                barcode: decodedText,
+                product_name: "Sample Product",  // Modify as needed
+                price: "0.00" // Modify as needed
+            };
+
+            fetch(webAppUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(barcodeData)
+            })
+            .then(response => response.text())
+            .then(data => alert("Response: " + data))
+            .catch(error => alert("Error: " + error));
+        }
+    </script>
+
+</body>
+</html>
+
+    <h2>Scan a Barcode</h2>
+    <div id="reader" style="width: 300px;"></div>
+    <p id="result">Waiting for scan...</p>
+    
+    <script>
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzXWQMxDEPoHZNnN-WuTMn4i67CStAu4D8gjsZ4lp-6H-BAZxn-x-PrMB4yy642Is5X/exec"; // Replace with your Web App URL
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('result').innerText = "Scanned: " + decodedText;
+            
+            let barcodeData = {
+                barcode: decodedText,
+                product_name: "Sample Product", // Modify this as needed
+                price: "0.00" // Modify this as needed
+            };
+            
+            fetch(webAppUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(barcodeData)
+            })
+            .then(response => response.text())
+            .then(data => alert("Response: " + data))
+            .catch(error => alert("Error: " + error));
+        }
+        
+        let html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess);
+    </script>
+</body>
+</html>
